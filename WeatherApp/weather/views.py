@@ -1,12 +1,19 @@
 from django.shortcuts import render
 import requests
 from .models import City
+from .forms import CityForm
 # Create your views here.
 
 def index(request):
 
     appid = 'd731ec31aa625c0a8a10db99f6b32f8e'
     url = "https://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid=" + appid
+
+    if request.method == 'POST':
+        form = CityForm(request.POST)
+        form.save()
+
+    form = CityForm
 
     cities = City.objects.all()
 
@@ -23,8 +30,15 @@ def index(request):
         }
         all_cities.append(city_info)
 
-    context = {'all_info': all_cities}
+    context = {'all_info': all_cities, 'form': form}
     return render(request, 'weather/weather.html', context)
+
+
+
+
+
+
+
 
 
 
@@ -38,7 +52,7 @@ def index(request):
 #         continue
 #     city_weather = response.json()
 #
-#Also, you should check that you are formatting your URL properly.
+# Also, you should check that you are formatting your URL properly.
 # As it stands, you are inserting your City object directly into the URL
 # - this will only work if you have defined a __str__ method that returns only the city name.
 # It would be better to use the name directly:
